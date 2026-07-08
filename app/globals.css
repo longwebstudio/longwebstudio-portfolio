@@ -1,27 +1,94 @@
+/* Import 3 tầng lõi tiêu chuẩn của Tailwind CSS */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+/* Thiết lập mặc định cho hệ thống giao diện */
+@layer base {
+  html {
+    /* Tạo hiệu ứng cuộn chuột mượt mà khi bấm link neo hoặc quay lại đầu trang */
+    scroll-behavior: smooth;
+    /* Khử răng cưa phông chữ trên nền tảng MacOS và Windows */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+  body {
+    /* Đảm bảo giao diện không bị giật lag thanh scroll khi chuyển đổi qua lại giữa các trang */
+    overflow-y: scroll;
+    text-rendering: optimizeLegibility;
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+/* TÙY BIẾN CHO PHẦN RENDER NỘI DUNG TỪ WORDPRESS GAUTENBERG (PROSE CLASS TWEAKS) */
+@layer components {
+  /* Định dạng lại khối nội dung HTML thô đổ từ WordPress Content API */
+  .prose {
+    --tw-prose-body: #374151; /* Màu xám đen dễ đọc cho chữ thường */
+    --tw-prose-headings: #111827; /* Màu đen đậm sắc nét cho tiêu đề */
+    --tw-prose-links: #2563eb; /* Màu xanh công nghệ cho liên kết */
+    --tw-prose-bold: #111827;
+    max-width: 100%;
+  }
+
+  /* Tối ưu khoảng cách và kích thước cho các khối thẻ tiêu đề thô bên trong bài viết */
+  .prose h2 {
+    @apply text-2xl font-bold tracking-tight mt-10 mb-4 text-gray-900;
+  }
+
+  .prose h3 {
+    @apply text-xl font-bold tracking-tight mt-8 mb-3 text-gray-900;
+  }
+
+  /* Định dạng đoạn văn bản và liên kết trong bài viết */
+  .prose p {
+    @apply text-base leading-relaxed text-gray-600 mb-6;
+  }
+
+  .prose a {
+    @apply font-semibold text-blue-600 underline decoration-blue-500/30 underline-offset-4 transition-colors hover:text-blue-700 hover:decoration-blue-700;
+  }
+
+  /* Định dạng khối danh sách (Bullets List) từ WordPress */
+  .prose ul {
+    @apply list-disc list-inside space-y-2.5 mb-6 pl-2 text-gray-600;
+  }
+
+  .prose li {
+    @apply text-base leading-relaxed;
+  }
+
+  /* Tùy biến hình ảnh nhúng trực tiếp trong bài viết từ WordPress */
+  .prose img {
+    @apply rounded-2xl border border-gray-100 shadow-sm mx-auto my-8 max-w-full h-auto;
+  }
+
+  /* Định dạng khối trích dẫn nếu bạn có dùng trong WordPress */
+  .prose blockquote {
+    @apply border-l-4 border-blue-500 pl-4 italic text-gray-700 bg-gray-50/50 py-2 rounded-r-xl mb-6;
+  }
+}
+
+/* LOẠI BỎ HIỆU ỨNG TẬP TRUNG VIỀN XẤU KHI NHẤN CHUỘT TRÊN THIẾT BỊ DI ĐỘNG */
+input, textarea, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ĐỊNH DẠNG THANH CUỘN CHUỘT (SCROLLBAR) TINH TẾ CHUẨN DESIGNER */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f9fafb; /* Màu nền thanh cuộn (Xám siêu nhạt) */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e5e7eb; /* Màu con trượt (Xám nhạt) */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db; /* Đậm hơn một chút khi rê chuột vào */
 }
