@@ -1,6 +1,6 @@
-// ==========================================
-// 1. ĐỊNH NGHĨA CÁC KIỂU DỮ LIỆU CHUẨN (TYPES)
-// ==========================================
+// =========================================================================
+// 1. ĐỊNH NGHĨA CÁC KIỂU DỮ LIỆU ĐỒNG BỘ THEO SCHEMA WORDPRESS GRAPHQL (TYPES)
+// =========================================================================
 
 export interface LwsSeoData {
   metaTitle?: string;
@@ -15,7 +15,7 @@ export interface LwsSeoData {
 export interface ProjectNode {
   title: string;
   slug: string;
-  content?: string; // Dùng cho trang chi tiết dự án
+  content?: string; // Dùng riêng cho trang chi tiết dự án
   featuredImage?: {
     node: {
       sourceUrl: string;
@@ -32,12 +32,12 @@ export interface ProjectNode {
       slug: string;
     }[];
   };
-  lwsSeo?: LwsSeoData; // Trường dữ liệu SEO mở nâng cao
+  lwsSeo?: LwsSeoData; // Trường Technical SEO tùy biến
 }
 
 export interface PlanNode {
   title: string;
-  excerpt: string; // Dùng trích dẫn làm mô tả ngắn cho gói
+  excerpt: string; // Dùng trích dẫn bài viết làm mô tả gói dịch vụ
   planDetails: {
     price: string;
     priceYearly: string;
@@ -49,17 +49,17 @@ export interface PlanNode {
 
 export interface SitemapProjectNode {
   slug: string;
-  modified: string; // Ngày cập nhật cuối cùng phục vụ SEO Sitemap
+  modified: string; // Ngày cập nhật cuối cùng từ WordPress để Google Bot cào sitemap
 }
 
 
-// ==========================================
-// 2. HÀM CORE FETCH GRAPHQL (TÍCH HỢP CACHE TAG)
-// ==========================================
+// =========================================================================
+// 2. HÀM CORE FETCH GRAPHQL LÕI (BẢO MẬT PRIVATE TOKEN & ĐỊNH DANH CACHE TAG)
+// =========================================================================
 
 async function fetchGraphQL(query: string, variables = {}) {
   const wordpressUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
-  const privateToken = process.env.LWS_GRAPHQL_PRIVATE_TOKEN;
+  const privateToken = process.env.LWS_GRAPHQL_PRIVATE_TOKEN; // Khóa xác thực Backend độc quyền
   
   if (!wordpressUrl) {
     throw new Error('Chưa cấu hình biến môi trường NEXT_PUBLIC_WORDPRESS_API_URL');
@@ -72,9 +72,10 @@ async function fetchGraphQL(query: string, variables = {}) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      // BẮT BUỘC: Nhúng khóa bảo mật private token vào header để bypass bộ lọc WordPress
       'lws-secret-token': privateToken, 
     },
-    // LƯU CACHE TĨNH: Giữ file static tối đa 7 ngày và gán thẻ định danh để Webhook xóa cache khi cần
+    // KỸ THUẬT CACHE TĨNH: Lưu file static 7 ngày, cho phép xóa cache lập tức bằng thẻ tag định danh
     next: { 
       revalidate: 604800, 
       tags: ['wordpress-data'] 
@@ -88,20 +89,20 @@ async function fetchGraphQL(query: string, variables = {}) {
   const json = await res.json();
   
   if (json.errors) {
-    console.error('GraphQL Errors:', json.errors);
-    throw new Error('Lỗi truy vấn dữ liệu từ hệ thống GraphQL API');
+    console.error('GraphQL Query Errors:', json.errors);
+    throw new Error('Hệ thống máy chủ WordPress từ chối lệnh thực thi GraphQL API');
   }
 
   return json.data;
 }
 
 
-// ==========================================
-// 3. CÁC HÀM TRUY VẤN DỮ LIỆU (QUERIES)
-// ==========================================
+// =========================================================================
+// 3. CÁC HÀM TRUY VẤN DỮ LIỆU TĨNH & ĐỘNG (QUERIES)
+// =========================================================================
 
 /**
- * Lấy toàn bộ danh sách dự án kèm danh mục và SEO dữ liệu hiển thị lên lưới Portfolio
+ * Lấy danh sách toàn bộ dự án kèm danh mục và SEO Metadata ra trang Portfolio
  */
 export async function getAllProjectsForPortfolio(): Promise<ProjectNode[]> {
   const query = `
@@ -144,7 +145,7 @@ export async function getAllProjectsForPortfolio(): Promise<ProjectNode[]> {
 }
 
 /**
- * Lấy chi tiết thông tin và SEO Metadata của một dự án dựa theo đường dẫn Slug
+ * Lấy nội dung chi tiết bài viết và SEO Metadata của dự án dựa theo đường dẫn Slug
  */
 export async function getProjectBySlug(slug: string): Promise<ProjectNode | null> {
   const query = `
@@ -186,7 +187,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectNode | null
 }
 
 /**
- * Lấy toàn bộ danh sách gói dịch vụ bảng giá (Plans) kèm giá năm chiết khấu từ WordPress
+ * Lấy toàn bộ danh sách gói dịch vụ bảng giá (Plans) động từ WordPress
  */
 export async function getAllPlansFromGraphQL(): Promise<PlanNode[]> {
   const query = `
@@ -211,7 +212,7 @@ export async function getAllPlansFromGraphQL(): Promise<PlanNode[]> {
 }
 
 /**
- * Lấy danh sách toàn bộ Slug dự án (Phục vụ cho generateStaticParams)
+ * Lấy danh sách toàn bộ Slug dự án (Phục vụ xây dựng SSG cho generateStaticParams)
  */
 export async function getAllProjectSlugs(): Promise<{ slug: string }[]> {
   const query = `
@@ -228,7 +229,7 @@ export async function getAllProjectSlugs(): Promise<{ slug: string }[]> {
 }
 
 /**
- * Lấy danh sách dự án kèm ngày cập nhật (Phục vụ cho sitemap.ts động)
+ * Lấy danh sách dự án kèm ngày chỉnh sửa (Phục vụ xây dựng sitemap.ts động tự cập nhật)
  */
 export async function getProjectsForSitemap(): Promise<SitemapProjectNode[]> {
   const query = `
@@ -246,9 +247,9 @@ export async function getProjectsForSitemap(): Promise<SitemapProjectNode[]> {
 }
 
 
-// ==========================================
-// 4. HÀM GỬI DỮ LIỆU FORM (MUTATIONS)
-// ==========================================
+// =========================================================================
+// 4. HÀM GỬI LIÊN HỆ TƯ VẤN (MUTATIONS BẢO MẬT PRIVATE TOKEN)
+// =========================================================================
 
 interface ContactVariables {
   name: string;
@@ -258,7 +259,7 @@ interface ContactVariables {
 }
 
 /**
- * Gửi dữ liệu form liên hệ tư vấn lên WordPress qua GraphQL Mutation
+ * Đẩy dữ liệu form liên hệ của khách hàng sang WordPress xử lý Resend Mail qua cổng GraphQL Mutation
  */
 export async function submitContactMutation(variables: ContactVariables) {
   const query = `
@@ -271,13 +272,18 @@ export async function submitContactMutation(variables: ContactVariables) {
   `;
 
   const wordpressUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
-  if (!wordpressUrl) throw new Error('Chưa cấu hình biến môi trường API');
+  const privateToken = process.env.LWS_GRAPHQL_PRIVATE_TOKEN; // Khóa bảo mật biểu mẫu chống spam bẩn
+  
+  if (!wordpressUrl) throw new Error('Chưa cấu hình biến môi trường NEXT_PUBLIC_WORDPRESS_API_URL');
+  if (!privateToken) throw new Error('Chưa cấu hình biến môi trường LWS_GRAPHQL_PRIVATE_TOKEN');
 
-  // Phương thức POST gửi mutation thay đổi trạng thái, luôn chạy trực tiếp (không cache)
+  // Phương thức POST gửi lệnh mutation thay đổi cơ sở dữ liệu, luôn bỏ qua cache chạy trực tiếp
   const res = await fetch(wordpressUrl, {
     method: 'POST',
     headers: { 
-      'Content-Type': 'application/json' 
+      'Content-Type': 'application/json',
+      // BẮT BUỘC: Đóng dấu mã khóa xác thực ẩn vào Header khi gửi form
+      'lws-secret-token': privateToken, 
     },
     body: JSON.stringify({ query, variables }),
   });
@@ -285,8 +291,8 @@ export async function submitContactMutation(variables: ContactVariables) {
   const json = await res.json();
   
   if (json.errors) {
-    console.error('Mutation Errors:', json.errors);
-    throw new Error('Lỗi thực thi GraphQL Mutation');
+    console.error('GraphQL Mutation Errors:', json.errors);
+    throw new Error('Lỗi thực thi dữ liệu GraphQL Mutation phễu liên hệ');
   }
 
   return json.data?.submitContactForm;

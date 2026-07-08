@@ -5,11 +5,8 @@ import { motion } from "motion/react";
 import { submitContactMutation } from "@/lib/api";
 
 export default function ContactPage() {
-  // Quản lý trạng thái dữ liệu form nhập liệu
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
-  // Quản lý trạng thái thông báo phản hồi hệ thống (Thành công / Thất bại)
   const [status, setStatus] = useState<{ type: "success" | "error" | null; msg: string }>({ type: null, msg: "" });
-  // Trạng thái chờ xử lý gửi request
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -17,15 +14,25 @@ export default function ContactPage() {
     setLoading(true);
     setStatus({ type: null, msg: "" });
 
-    try {
-      // Gọi lệnh thực thi GraphQL Mutation truyền mảng dữ liệu sạch sang WordPress
-      const result = await submitContactMutation(formData);
+    const cleanedPhone = formData.phone.replace(/[\s.-]/g, "");
+    const phoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/;
+    
+    if (!phoneRegex.test(cleanedPhone)) {
+      setStatus({ 
+        type: "error", 
+        msg: "Số điện thoại không đúng định dạng! Vui lòng nhập số điện thoại Việt Nam hợp lệ." 
+      });
+      setLoading(false);
+      return;
+    }
 
+    try {
+      const result = await submitContactMutation(formData);
       if (result && result.success) {
         setStatus({ type: "success", msg: result.message });
-        setFormData({ name: "", email: "", phone: "", message: "" }); // Xóa sạch form khi thành công
+        setFormData({ name: "", email: "", phone: "", message: "" });
       } else {
-        setStatus({ type: "error", msg: result?.message || "Đã xảy ra lỗi hệ thống khi lưu trữ dữ liệu!" });
+        setStatus({ type: "error", msg: result?.message || "Đã xảy ra lỗi hệ thống!" });
       }
     } catch (error) {
       setStatus({ type: "error", msg: "Không thể kết nối đến máy chủ GraphQL API!" });
@@ -36,7 +43,6 @@ export default function ContactPage() {
 
   return (
     <section className="max-w-3xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-      {/* Hiệu ứng trượt mở tiêu đề trang */}
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -50,62 +56,68 @@ export default function ContactPage() {
         </p>
       </motion.div>
 
-      {/* Hiệu ứng Form lướt hiện từ dưới lên */}
       <motion.form 
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
         onSubmit={handleSubmit}
-        className="space-y-6 bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-sm"
+        className="bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-sm space-y-6"
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-semibold text-gray-700">Họ và tên *</label>
+            <label htmlFor="name" className="block text-sm font-semibold text-gray-700">Họ và tên *</label>
             <input
+              id="name"
               type="text"
               required
+              disabled={loading}
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+              className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
               placeholder="Ví dụ: Nguyễn Văn A"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700">Số điện thoại *</label>
+            <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">Số điện thoại *</label>
             <input
+              id="phone"
               type="tel"
               required
+              disabled={loading}
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+              className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
               placeholder="Ví dụ: 0901234567"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700">Địa chỉ Email (Không bắt buộc)</label>
+          <label htmlFor="email" className="block text-sm font-semibold text-gray-700">Địa chỉ Email (Không bắt buộc)</label>
           <input
+            id="email"
             type="email"
+            disabled={loading}
             value={formData.email}
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+            className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
             placeholder="khachhang@example.com"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-700">Chi tiết yêu cầu thiết kế / Ý tưởng dự án</label>
+          <label htmlFor="message" className="block text-sm font-semibold text-gray-700">Chi tiết yêu cầu thiết kế / Ý tưởng dự án</label>
           <textarea
+            id="message"
             rows={4}
+            disabled={loading}
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all"
-            placeholder="Ví dụ: Mình cần thiết kế một website bán hàng thời trang tích hợp thanh toán tự động và tốc độ tải trang nhanh..."
+            className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
+            placeholder="Ví dụ: Mình cần thiết kế một website bán hàng thời trang..."
           />
         </div>
 
-        {/* Khối hiển thị thông báo trạng thái phản hồi */}
         {status.type && (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
@@ -120,13 +132,12 @@ export default function ContactPage() {
           </motion.div>
         )}
 
-        {/* Nút gửi form tương tác hiệu ứng nhấn chu kỳ bấm chuột */}
         <motion.button
           whileTap={{ scale: 0.98 }}
           type="submit"
           disabled={loading}
-          className={`w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all cursor-pointer ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
+          className={`w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${
+            loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
           }`}
         >
           {loading ? "Đang gửi thông tin yêu cầu..." : "Gửi yêu cầu tư vấn ngay"}
