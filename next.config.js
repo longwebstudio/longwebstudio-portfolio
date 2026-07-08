@@ -7,6 +7,8 @@ const nextConfig = {
           hostname: 'longwebstudio.io.vn', // Thay thế bằng domain chứa mã nguồn WordPress của bạn
         },
       ],
+      loader: 'custom',
+    loaderFile: './image-loader.js',
     },
   };
   

@@ -13,7 +13,7 @@ const inter = Inter({
 export const metadata = {
   title: 'Long Web Studio - Thiết Kế Website Chuẩn SEO & Tối Ưu Chuyển Đổi',
   description: 'Chuyên cung cấp dịch vụ thiết kế website doanh nghiệp, landing page thực chiến và hệ thống Headless CMS cao cấp bởi Freelancer Long Web Studio.',
-  metadataBase: new URL('https://longwebstudio.io.vn'),
+  metadataBase: new URL('https://www.longwebstudio.io.vn'),
   
   // 1. TỰ ĐỘNG BIÊN DỊCH CÁC THẺ LINK FAVICON & APPLE-TOUCH-ICON
   icons: {
@@ -86,7 +86,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 Bảng giá
               </Link>
               <a 
-                href="https://longwebstudio.net" 
+                href="https://blog.longwebstudio.io.vn" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center gap-1 group"
