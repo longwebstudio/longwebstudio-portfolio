@@ -191,24 +191,24 @@ export async function getProjectBySlug(slug: string): Promise<ProjectNode | null
  */
 export async function getAllPlansFromGraphQL(): Promise<PlanNode[]> {
   const query = `
-    query GetLwsPricingPlans {
-      posts(where: {categoryName: "plans"}, first: 20) {
-        nodes {
-          title
-          excerpt
-          planDetails {
-            price
-            priceYearly
-            ctaText
-            features
-            featured
-          }
+  query GetLwsPricingPlans {
+    plans(first: 3, where: {orderby: {field: MODIFIED, order: DESC}}) {
+      nodes {
+        title
+        excerpt
+        planDetails {
+          price
+          priceYearly
+          ctaText
+          features
+          featured
         }
       }
     }
+  }
   `;
   const data = await fetchGraphQL(query);
-  return data?.posts?.nodes || [];
+  return data?.plans?.nodes || [];
 }
 
 /**

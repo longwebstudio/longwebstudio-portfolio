@@ -111,7 +111,7 @@ export default function PricingContent({ plans }: PricingContentProps) {
                       </motion.span>
                     </AnimatePresence>
                   </div>
-                  <span className="text-lg font-bold text-gray-500 ml-1">Triệu VNĐ</span>
+                  <span className="text-lg font-bold text-gray-500 ml-1">K</span>
                   <span className="text-xs font-medium text-gray-400 ml-2 self-end mb-1 tracking-wide">{subText}</span>
                 </div>
 
