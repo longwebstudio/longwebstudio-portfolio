@@ -63,7 +63,18 @@ export async function OPTIONS(request: NextRequest) {
       }
   
       // 4. Trả kết quả { success, message, results } về cho trình duyệt đang chạy trên trang VNPost
-      return NextResponse.json(json.data?.capNhatDanhSachBienLaiBH);
+      // return NextResponse.json(json.data?.capNhatDanhSachBienLaiBH);
+
+      // 4. Trả về kết quả { status: boolean, message: string } cho Client-side Next.js
+      const origin = request.headers.get('origin') || '*';
+
+      return NextResponse.json(json.data?.capNhatDanhSachBienLaiBH, {
+      headers: {
+          'Access-Control-Allow-Origin': origin,
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      }
+      });
   
     } catch (error) {
       console.error('Sync Receipt API Route Error:', error);
