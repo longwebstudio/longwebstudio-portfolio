@@ -259,41 +259,22 @@ interface ContactVariables {
 }
 
 /**
- * Đẩy dữ liệu form liên hệ của khách hàng sang WordPress xử lý Resend Mail qua cổng GraphQL Mutation
+ * Gửi dữ liệu form liên hệ thông qua Next.js API Route trung gian để bảo mật Token
  */
 export async function submitContactMutation(variables: ContactVariables) {
-  const query = `
-    mutation SubmitForm($name: String!, $phone: String!, $email: String!, $message: String!) {
-      submitContactForm(input: {name: $name, phone: $phone, email: $email, message: $message}) {
-        success
-        message
-      }
-    }
-  `;
-
-  const wordpressUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
-  const privateToken = process.env.LWS_GRAPHQL_PRIVATE_TOKEN; // Khóa bảo mật biểu mẫu chống spam bẩn
-  
-  if (!wordpressUrl) throw new Error('Chưa cấu hình biến môi trường NEXT_PUBLIC_WORDPRESS_API_URL');
-  if (!privateToken) throw new Error('Chưa cấu hình biến môi trường LWS_GRAPHQL_PRIVATE_TOKEN');
-
-  // Phương thức POST gửi lệnh mutation thay đổi cơ sở dữ liệu, luôn bỏ qua cache chạy trực tiếp
-  const res = await fetch(wordpressUrl, {
+  // Gọi trực tiếp vào Route Handler nội bộ của Next.js
+  const res = await fetch('/api/contact', {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',
-      // BẮT BUỘC: Đóng dấu mã khóa xác thực ẩn vào Header khi gửi form
-      'lws-secret-token': privateToken, 
     },
-    body: JSON.stringify({ query, variables }),
+    body: JSON.stringify(variables),
   });
 
-  const json = await res.json();
-  
-  if (json.errors) {
-    console.error('GraphQL Mutation Errors:', json.errors);
-    throw new Error('Lỗi thực thi dữ liệu GraphQL Mutation phễu liên hệ');
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || 'Lỗi kết nối API Route');
   }
 
-  return json.data?.submitContactForm;
+  return await res.json(); // Trả về object chứa { success: boolean, message: string }
 }
