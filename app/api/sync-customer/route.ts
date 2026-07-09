@@ -57,9 +57,18 @@ export async function POST(request: NextRequest) {
       console.error('GraphQL System Errors:', json.errors);
       return NextResponse.json({ status: false, message: 'Hệ thống WordPress từ chối đồng bộ gói tin!' }, { status: 400 });
     }
+    
 
     // 4. Trả về kết quả { status: boolean, message: string } cho Client-side Next.js
-    return NextResponse.json(json.data?.syncCustomer);
+    const origin = request.headers.get('origin') || '*';
+
+return NextResponse.json(json.data?.syncCustomer, {
+  headers: {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  }
+});
 
   } catch (error) {
     console.error('Sync Customer Route Error:', error);
