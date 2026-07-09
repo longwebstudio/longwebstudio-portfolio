@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export async function OPTIONS(request: NextRequest) {
+    const origin = request.headers.get('origin') || '*';
+    return new NextResponse(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
+  }
+  
+
 export async function POST(request: NextRequest) {
     // return NextResponse.json({ status: true, message: 'Lỗi cấu hình biến môi trường trên Server!' }, { status: 250 });
   try {
