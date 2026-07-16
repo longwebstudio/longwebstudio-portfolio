@@ -3,7 +3,7 @@ import { getProjectsForSitemap } from '@/lib/api';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Định cấu hình URL trang chủ chính thức có tiền tố www của thương hiệu
-  const baseUrl = 'https://longwebstudio.io.vn';
+  const baseUrl = 'https://www.longwebstudio.io.vn';
 
   // 1. Khai báo danh sách cấu trúc các tuyến đường tĩnh cố định của hệ thống
   const staticRoutes: MetadataRoute.Sitemap = [
