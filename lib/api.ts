@@ -57,43 +57,109 @@ export interface SitemapProjectNode {
 // 2. HÀM CORE FETCH GRAPHQL LÕI (BẢO MẬT PRIVATE TOKEN & ĐỊNH DANH CACHE TAG)
 // =========================================================================
 
+// async function fetchGraphQL(query: string, variables = {}) {
+//   const wordpressUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
+//   const privateToken = process.env.LWS_GRAPHQL_PRIVATE_TOKEN; // Khóa xác thực Backend độc quyền
+  
+//   if (!wordpressUrl) {
+//     throw new Error('Chưa cấu hình biến môi trường NEXT_PUBLIC_WORDPRESS_API_URL');
+//   }
+//   if (!privateToken) {
+//     throw new Error('Chưa cấu hình biến môi trường LWS_GRAPHQL_PRIVATE_TOKEN');
+//   }
+
+//   const res = await fetch(wordpressUrl, {
+//     method: 'POST',
+//     headers: {
+//       'Content-Type': 'application/json',
+//       // BẮT BUỘC: Nhúng khóa bảo mật private token vào header để bypass bộ lọc WordPress
+//       'lws-secret-token': privateToken, 
+//     },
+//     // KỸ THUẬT CACHE TĨNH: Lưu file static 7 ngày, cho phép xóa cache lập tức bằng thẻ tag định danh
+//     next: { 
+//       revalidate: 604800, 
+//       tags: ['wordpress-data'] 
+//     },
+//     body: JSON.stringify({
+//       query,
+//       variables,
+//     }),
+//   });
+
+//   const json = await res.json();
+  
+//   if (json.errors) {
+//     console.error('GraphQL Query Errors:', json.errors);
+//     return null;
+//     // throw new Error('Hệ thống máy chủ WordPress từ chối lệnh thực thi GraphQL API');
+//   }
+
+//   return json.data;
+// }
+
 async function fetchGraphQL(query: string, variables = {}) {
   const wordpressUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
-  const privateToken = process.env.LWS_GRAPHQL_PRIVATE_TOKEN; // Khóa xác thực Backend độc quyền
-  
+  const privateToken = process.env.LWS_GRAPHQL_PRIVATE_TOKEN;
+
   if (!wordpressUrl) {
+    console.error('[Cấu hình] Thiếu biến môi trường NEXT_PUBLIC_WORDPRESS_API_URL');
     throw new Error('Chưa cấu hình biến môi trường NEXT_PUBLIC_WORDPRESS_API_URL');
   }
   if (!privateToken) {
+    console.error('[Cấu hình] Thiếu biến môi trường LWS_GRAPHQL_PRIVATE_TOKEN');
     throw new Error('Chưa cấu hình biến môi trường LWS_GRAPHQL_PRIVATE_TOKEN');
   }
 
-  const res = await fetch(wordpressUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      // BẮT BUỘC: Nhúng khóa bảo mật private token vào header để bypass bộ lọc WordPress
-      'lws-secret-token': privateToken, 
-    },
-    // KỸ THUẬT CACHE TĨNH: Lưu file static 7 ngày, cho phép xóa cache lập tức bằng thẻ tag định danh
-    next: { 
-      revalidate: 604800, 
-      tags: ['wordpress-data'] 
-    },
-    body: JSON.stringify({
-      query,
-      variables,
-    }),
-  });
+  try {
+    const res = await fetch(wordpressUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'lws-secret-token': privateToken,
+      },
+      next: {
+        revalidate: 604800, // 7 ngày
+        tags: ['wordpress-data'],
+      },
+      body: JSON.stringify({
+        query,
+        variables,
+      }),
+    });
 
-  const json = await res.json();
-  
-  if (json.errors) {
-    console.error('GraphQL Query Errors:', json.errors);
-    throw new Error('Hệ thống máy chủ WordPress từ chối lệnh thực thi GraphQL API');
+    // 1. XỬ LÝ LỖI TRẠNG THÁI HTTP (Ví dụ: 500, 502, 403, 404)
+    if (!res.ok) {
+      // Đọc nội dung phản hồi dưới dạng text để hỗ trợ debug
+      const errorText = await res.text().catch(() => 'Không thể đọc phản hồi');
+      console.error(`[HTTP Error] Status: ${res.status} ${res.statusText}. Response:`, errorText);
+      
+      // Bạn có thể trả về null để trang web hiển thị dữ liệu trống (mềm dẻo hơn)
+      // Hoặc ném lỗi nếu muốn Next.js kích hoạt Error Boundary (tùy nhu cầu dự án)
+      return null;
+    }
+
+    // 2. XỬ LÝ LỖI PHÂN TÍCH JSON (Đề phòng trường hợp phản hồi không phải JSON)
+    let json;
+    try {
+      json = await res.json();
+    } catch (parseError) {
+      console.error('[JSON Parse Error] Không thể chuyển đổi phản hồi sang JSON:', parseError);
+      return null;
+    }
+
+    // 3. XỬ LÝ LỖI TRUY VẤN GRAPHQL (WPGraphQL trả về mã lỗi bên trong trường errors)
+    if (json.errors) {
+      console.error('[GraphQL Error] Lỗi thực thi truy vấn:', JSON.stringify(json.errors, null, 2));
+      return null;
+    }
+
+    return json.data;
+
+  } catch (networkError) {
+    // 4. XỬ LÝ LỖI KẾT NỐI MẠNG (Server sập, timeout, không có mạng)
+    console.error('[Network Error] Không thể kết nối tới server WordPress:', networkError);
+    return null;
   }
-
-  return json.data;
 }
 
 
@@ -277,4 +343,57 @@ export async function submitContactMutation(variables: ContactVariables) {
   }
 
   return await res.json(); // Trả về object chứa { success: boolean, message: string }
+}
+
+// =========================================================================
+// 1. ĐỊNH NGHĨA KIỂU DỮ LIỆU WOOCOMMERCE VARIATION (TYPES)
+// =========================================================================
+
+export interface LwsProductVariation {
+  databaseId: number; // ID thực tế để chạy link mua nhanh (1118, 1119, 1120)
+  name: string;       // Tên biến thể (1 Tháng, 1 Năm, 3 Năm)
+  price: string;      // Giá tiền đã xử lý định dạng (đ)
+  description: string | null; // Mô tả ngắn riêng cho từng gói
+}
+
+export interface LwsWooCommerceProduct {
+  databaseId: number;
+  name: string;
+  description: string;
+  variations: {
+    nodes: LwsProductVariation[];
+  };
+}
+
+// =========================================================================
+// 2. HÀM CORE FETCH SẢN PHẨM & BIẾN THỂ TỪ WOOCOMMERCE GRAPHQL
+// =========================================================================
+
+/**
+ * Lấy chi tiết sản phẩm Ứng dụng LWS kèm toàn bộ các gói biến thể của nó
+ * @param productDbId ID của sản phẩm gốc (Sản phẩm có biến thể)
+ */
+export async function getLwsProductFromWooGraphQL(productDbId: number): Promise<LwsWooCommerceProduct | null> {
+  const query = `
+    query GetLwsWooProduct($id: ID!) {
+      product(id: $id, idType: DATABASE_ID) {
+        ... on VariableProduct {
+          databaseId
+          name
+          description
+          variations(first: 10) {
+            nodes {
+              databaseId
+              name
+              price
+              description
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await fetchGraphQL(query, { id: productDbId.toString() });
+  return data?.product || null;
 }
