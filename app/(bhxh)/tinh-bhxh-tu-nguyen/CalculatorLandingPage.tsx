@@ -17,7 +17,7 @@ const STEP = 50000;
 const STATE_SUPPORT = 66000;
 const LOCAL_SUPPORT = 66000;
 
-const MONTHLY_INTEREST_RATE = 0.0035; 
+const MONTHLY_INTEREST_RATE = 0.0031; 
 
 const PAYMENT_CYCLES = [
   { label: 'Hàng tháng', months: 1 },
