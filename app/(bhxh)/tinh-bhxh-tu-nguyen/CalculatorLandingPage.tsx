@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 const MIN_INCOME = 1500000;
-const MAX_INCOME = 24350000;
+const MAX_INCOME = 50600000; // Nâng mức thu nhập tối đa lên 50.600.000đ (20 lần lương cơ sở 2.530.000đ từ T7/2026)
 const STEP = 50000;
 const STATE_SUPPORT = 66000;
 const LOCAL_SUPPORT = 66000;
@@ -300,7 +300,7 @@ Anh/chị cần hỗ trợ thêm thông tin hoặc làm hồ sơ đăng ký cứ
                 <div className="mt-4">
                   <span className="text-xs text-slate-650 font-bold block mb-2">Mốc thu nhập tham khảo nhanh:</span>
                   <div className="flex flex-wrap gap-2">
-                    {[1500000, 3000000, 5000000, 10000000, 15000000, 20000000, 24350000].map((val) => (
+                    {[1500000,3000000, 5000000, 10000000, 20000000, 30000000, 40000000, 50600000].map((val) => (
                       <button
                         key={val}
                         onClick={() => setSelectedIncome(val)}
@@ -308,10 +308,10 @@ Anh/chị cần hỗ trợ thêm thông tin hoặc làm hồ sơ đăng ký cứ
                           selectedIncome === val 
                             ? 'bg-emerald-700 border-emerald-750 text-white' 
                             : 'bg-white border-slate-250 text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      {formatVND(val)}
-                    </button>
+                        }`}
+                      >
+                        {formatVND(val)}
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -401,7 +401,7 @@ Anh/chị cần hỗ trợ thêm thông tin hoặc làm hồ sơ đăng ký cứ
                 <div className="p-4 bg-blue-50/50 border border-blue-100 rounded-xl font-medium">
                   <span className="text-xs text-blue-900 font-bold block mb-1">Tỷ lệ hưởng lương hưu hằng tháng</span>
                   <span className="text-2xl font-black text-blue-800 block">{pensionCalculations.rate}%</span>
-                  <p className="text-[11px] text-slate-650 mt-2 leading-relaxed">
+                  <p className="text-[11px] text-slate-655 mt-2 leading-relaxed">
                     {gender === 'Nam' ? (
                       <span>
                         Lao động <strong className="text-slate-800">Nam</strong> đóng 15 năm hưởng <strong className="text-slate-900">40%</strong>. Từ năm 16 đến 20, mỗi năm cộng <strong className="text-slate-900">1%</strong> (đạt 45% khi đóng đủ 20 năm). Từ năm thứ 21 trở đi, mỗi năm đóng thêm cộng <strong className="text-slate-900">2%</strong>, đạt tỷ lệ hưởng lương hưu tối đa hưởng <strong>75%</strong> khi đóng đủ <strong className="text-emerald-800">35 năm</strong>.
@@ -659,7 +659,7 @@ Anh/chị cần hỗ trợ thêm thông tin hoặc làm hồ sơ đăng ký cứ
             </div>
             <h3 className="font-extrabold text-lg text-slate-900">Linh Hoạt Lựa Chọn Đóng</h3>
             <p className="text-slate-700 text-sm leading-relaxed">
-              Được tự quyết định mức thu nhập làm căn cứ đóng phù hợp với tài chính cá nhân (từ 1,5 triệu đến 24,35 triệu) quy định tại <strong>Điều 87 Luật BHXH số 58/2014/QH13</strong>. Linh hoạt chọn phương thức đóng hàng tháng, đóng trước 3, 6, 12 tháng hoặc đóng gộp từ 2 đến 5 năm để nhận chiết khấu tốt nhất.
+              Được tự quyết định mức thu nhập làm căn cứ đóng phù hợp với tài chính cá nhân (từ 1.500.000 VNĐ đến tối đa 50.600.000 VNĐ/tháng) quy định tại <strong>Điều 87 Luật BHXH số 58/2014/QH13</strong>. Linh hoạt chọn phương thức đóng hàng tháng, đóng trước 3, 6, 12 tháng hoặc đóng gộp từ 2 đến 5 năm để nhận chiết khấu tốt nhất.
             </p>
           </div>
         </div>
