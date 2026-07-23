@@ -27,11 +27,11 @@ export default function Footer() {
               <Link href="/" className="hover:text-red-500 transition-colors">Trang chủ</Link>
             </li>
             <li>
-              <Link href="/sach-dau-tu" className="hover:text-red-500 transition-colors">Tủ Sách Đầu Tư</Link>
+              <Link href="/pricing" className="hover:text-red-500 transition-colors">Bảng Giá Dịch Vụ</Link>
             </li>
             <li>
-              <a href="https://longwebstudio.io.vn" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors">
-                Dịch Vụ Thiết Kế Web
+              <a href="/contact" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors">
+                Tư Vấn Miễn Phí
               </a>
             </li>
           </ul>

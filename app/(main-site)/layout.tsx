@@ -2,6 +2,8 @@ import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import Script from 'next/script'; // BẮT BUỘC: Import component Script chuyên dụng của Next.js
 import '@/app/globals.css';
+import Header from '@/components/Header'; // Thanh điều hướng di động tối ưu
+import Footer from '@/components/MainFooter'; 
 
 const inter = Inter({ 
   subsets: ['vietnamese'],
@@ -68,77 +70,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
           `}
         </Script>
 
-        {/* 1. THANH ĐIỀU HƯỚNG CỐ ĐỊNH (NAVBAR) */}
-        <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <Link href="/" className="text-xl font-black tracking-tight text-gray-950 transition-transform hover:scale-[1.02]">
-              LONG<span className="text-blue-600">WEB</span>STUDIO
-            </Link>
-
-            <nav className="hidden md:flex items-center gap-8">
-              <Link href="/" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
-                Trang chủ
-              </Link>
-              <Link href="/portfolio" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
-                Dự án
-              </Link>
-              <Link href="/pricing" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
-                Bảng giá
-              </Link>
-              <a 
-                href="https://blog.longwebstudio.io.vn" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors inline-flex items-center gap-1 group"
-              >
-                Blog
-                <svg className="h-3.5 w-3.5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-                </svg>
-              </a>
-            </nav>
-
-            <div>
-              <Link href="/contact" className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-500 active:scale-[0.98] transition-all">
-                Liên hệ tư vấn
-              </Link>
-            </div>
-          </div>
-        </header>
-
-        {/* 2. KHU VỰC HIỂN THỊ NỘI DUNG ĐỘNG CỦA CÁC TRANG */}
-        <main className="flex-1">
+         {/* Thanh điều hướng công cộng */}
+         <Header />
+        
+        {/* Nội dung hiển thị chi tiết của các trang con */}
+        <main className="flex-grow">
           {children}
         </main>
-
-        {/* 3. THANH CHÂN TRANG (FOOTER) */}
-        <footer className="bg-gray-50 border-t border-gray-100 mt-auto">
-          <div className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left order-2 md:order-1">
-              <p className="text-sm text-gray-500">
-                &copy; {new Date().getFullYear()} Long Web Studio. Tất cả quyền được bảo lưu.
-              </p>
-              <p className="text-xs text-gray-400 mt-1">
-                Powered by Next.js & Headless WordPress Technology.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-2 order-1 md:order-2">
-              <span className="text-sm font-bold text-gray-400 tracking-wide border-r border-gray-200 pr-6 hidden sm:inline">
-                www.longwebstudio.io.vn
-              </span>
-              <Link href="/portfolio" className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
-                Portfolio
-              </Link>
-              <Link href="/pricing" className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
-                Bảng giá dịch vụ
-              </Link>
-              <Link href="/contact" className="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
-                Tư vấn miễn phí
-              </Link>
-            </div>
-          </div>
-        </footer>
+        
+        {/* Chân trang công cộng */}
+        <Footer />
 
       </body>
     </html>
