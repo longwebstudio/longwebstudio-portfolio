@@ -44,26 +44,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     openGraph: {
       title: tieuDeSEO,
       description: `Hệ thống tự động tra cứu dữ liệu tháng tuổi nghỉ hưu luật định và kết xuất dòng tiền đóng bảo hiểm tự nguyện tối ưu.`,
-      url: baseUrl,
       siteName: 'Hệ thống Phân tích An sinh Xã hội | Long Web Studio',
       locale: 'vi_VN',
       type: 'website',
-      // Chỉ dùng đường dẫn tĩnh chuẩn
-      images: [
-        {
-          url: '/lo-trinh-luong-huu/opengraph-image',
-          width: 1200,
-          height: 630,
-          alt: 'Tính tuổi nghỉ hưu & Lộ trình đóng tiếp BHXH tự nguyện chuẩn xác nhất',
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: tieuDeSEO,
-      description: `Tính tuổi nghỉ hưu & Lộ trình đóng tiếp BHXH tự nguyện chuẩn xác nhất`,
-      images: ['/lo-trinh-luong-huu/opengraph-image'],
-    },
+    }
   };
 }
 
