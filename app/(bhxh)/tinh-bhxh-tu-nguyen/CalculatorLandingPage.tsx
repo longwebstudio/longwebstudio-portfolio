@@ -565,6 +565,21 @@ Anh/chị cần hỗ trợ thêm thông tin hoặc làm hồ sơ đăng ký cứ
       />
       <Benefits />
       <FaqSection />
+      {/* Footer đã cập nhật thông tin hỗ trợ và tối ưu màu tương phản */}
+      <footer className="bg-slate-900 text-slate-100 py-12 border-t border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center space-x-2">
+              <ShieldCheck className="h-6 w-6 text-emerald-450" />
+              <span className="text-lg font-bold text-white tracking-tight">BHXH Tự Nguyện</span>
+            </div>
+            <div className="text-xs text-center md:text-right space-y-2 text-slate-300">
+              <p className="font-bold text-white">© 2026 Hệ thống tính toán BHXH trực tuyến.</p>
+              <p className="text-slate-400 max-w-xl leading-relaxed md:ml-auto">
+                Công cụ được Freelancer <a href="https://www.longwebstudio.io.vn/">Long Web Studio</a> duy trì và hỗ trợ nhân viên thu BHXH, BHYT tư vấn khách hàng lựa chọn mức thu nhập và phương thức đóng phù hợp khi tham gia BHXH tự nguyện.
+              </p>
+            </div>
+          </div>
+        </footer>
     </>
   );
 }
