@@ -167,7 +167,7 @@ ${data.lumpSumYears > 0 ? `- Giai đoạn 2 (Đóng gộp 1 lần): Tại năm $
       {/* Button link điều hướng nâng cao */}
       <div className="pt-2">
         <a 
-          href="https://longwebstudio.io.vn" 
+          href="https://longwebstudio.io.vn/go/tinh-bhxh-tu-nguyen" 
           target="_blank" 
           rel="noopener noreferrer" 
           className="w-full flex items-center justify-center gap-1 bg-slate-900 hover:bg-black text-white font-bold text-xs py-2.5 px-4 rounded-xl transition-colors shadow-sm"
