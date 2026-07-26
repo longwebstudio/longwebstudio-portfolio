@@ -234,6 +234,7 @@ Anh/chị cần hỗ trợ thêm thông tin hoặc làm hồ sơ đăng ký cứ
               <a href="#calculator" className="hover:text-emerald-800 transition">Công cụ tính</a>
               <a href="#table-lookup" className="hover:text-emerald-800 transition">Tra cứu bảng giá</a>
               <a href="#benefits" className="hover:text-emerald-800 transition">Quyền lợi</a>
+              <a href="https://www.longwebstudio.io.vn/lo-trinh-luong-huu" className="hover:text-emerald-800 transition">Lộ trình lương hưu</a>
             </nav>
             <a 
               href="#calculator" 
