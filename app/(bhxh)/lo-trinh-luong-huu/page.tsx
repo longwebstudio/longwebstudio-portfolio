@@ -7,29 +7,14 @@ interface Props {
   searchParams: Promise<{ [key: string]: string | undefined }> | { [key: string]: string | undefined };
 }
 
-// 1. GENERATE METADATA ĐỘNG ĐỂ TỐI ƯU SEO & HIỂN THỊ ẢNH OG
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  // Giải mã searchParams (tương thích cả Next.js 14 & 15+)
   const resolvedSearchParams = searchParams instanceof Promise ? await searchParams : searchParams;
   
   const hoten = resolvedSearchParams['hoten'];
   const khachHang = hoten ? ` cho ${hoten}` : '';
   const tieuDeSEO = `Tính tuổi nghỉ hưu & Lộ trình đóng tiếp BHXH tự nguyện chuẩn xác nhất${khachHang}`;
   
-  // Xử lý URL Canonical & Query string cho OG Image
   const baseUrl = 'https://www.longwebstudio.io.vn/lo-trinh-luong-huu';
-  const urlParams = new URLSearchParams();
-  if (resolvedSearchParams['hoten']) urlParams.set('hoten', resolvedSearchParams['hoten']);
-  if (resolvedSearchParams['thangsinh']) urlParams.set('thangsinh', resolvedSearchParams['thangsinh']);
-  if (resolvedSearchParams['namsinh']) urlParams.set('namsinh', resolvedSearchParams['namsinh']);
-  if (resolvedSearchParams['gioitinh']) urlParams.set('gioitinh', resolvedSearchParams['gioitinh']);
-  if (resolvedSearchParams['namdadong']) urlParams.set('namdadong', resolvedSearchParams['namdadong']);
-  
-  const queryString = urlParams.toString();
-  const canonicalUrl = baseUrl;
-
-  // Xây dựng URL động cho ảnh OpenGraph chứa searchParams (như hoten)
-  const ogImageUrl = `/lo-trinh-luong-huu/opengraph-image${queryString ? `?${queryString}` : ''}`;
 
   return {
     metadataBase: new URL('https://www.longwebstudio.io.vn'), 
@@ -54,37 +39,35 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       },
     },
     alternates: {
-      canonical: canonicalUrl,
+      canonical: baseUrl,
     },
     openGraph: {
       title: tieuDeSEO,
       description: `Hệ thống tự động tra cứu dữ liệu tháng tuổi nghỉ hưu luật định và kết xuất dòng tiền đóng bảo hiểm tự nguyện tối ưu.`,
-      url: canonicalUrl,
+      url: baseUrl,
       siteName: 'Hệ thống Phân tích An sinh Xã hội | Long Web Studio',
       locale: 'vi_VN',
       type: 'website',
-      // THÊM KHỐI IMAGES NÀY ĐỂ NEXT.JS TẠO THẺ METATAG THỰC SỰ
+      // Chỉ dùng đường dẫn tĩnh chuẩn
       images: [
         {
-          url: ogImageUrl,
+          url: '/lo-trinh-luong-huu/opengraph-image',
           width: 1200,
           height: 630,
-          alt: tieuDeSEO,
+          alt: 'Tính tuổi nghỉ hưu & Lộ trình đóng tiếp BHXH tự nguyện chuẩn xác nhất',
         },
       ],
     },
-    // THÊM THẺ TWITTER CARD
     twitter: {
       card: 'summary_large_image',
       title: tieuDeSEO,
       description: `Tính tuổi nghỉ hưu & Lộ trình đóng tiếp BHXH tự nguyện chuẩn xác nhất`,
-      images: [ogImageUrl],
+      images: ['/lo-trinh-luong-huu/opengraph-image'],
     },
   };
 }
 
 export default function Page() {
-  // 2. NHÚNG CẤU TRÚC SCHEMA MARKUP (JSON-LD)
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',

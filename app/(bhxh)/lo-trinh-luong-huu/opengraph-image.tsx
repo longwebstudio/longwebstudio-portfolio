@@ -6,37 +6,16 @@ export const alt = 'Tính tuổi nghỉ hưu & Lộ trình đóng tiếp BHXH t�
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
-// Hàm helper lấy font tiếng Việt sắc nét từ Google Fonts
-async function loadGoogleFont(font: string, text: string) {
-  const url = `https://fonts.googleapis.com/css2?family=${font}:wght@700;900&text=${encodeURIComponent(text)}`;
-  const css = await fetch(url).then((res) => res.text());
-  const resource = css.match(/src: url\((.+?)\) format\('(opentype|truetype)'\)/);
-
-  if (resource) {
-    const response = await fetch(resource[1]);
-    if (response.ok) {
-      return await response.arrayBuffer();
-    }
-  }
-
-  // Fallback lấy toàn bộ font Roboto nếu không fetch được subset
-  const fallbackUrl = 'https://github.com/google/fonts/raw/main/ofl/roboto/Roboto-Bold.ttf';
-  return await fetch(fallbackUrl).then((res) => res.arrayBuffer());
+// Tải font Inter Bold hỗ trợ 100% tiếng Việt
+async function getInterFont() {
+  const res = await fetch(
+    'https://raw.githubusercontent.com/google/fonts/main/ofl/inter/static/Inter-Bold.ttf'
+  );
+  return await res.arrayBuffer();
 }
 
-interface ImageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }> | { [key: string]: string | undefined };
-}
-
-export default async function Image({ searchParams }: ImageProps) {
-  // Đảm bảo tương thích cả Next.js 14 và Next.js 15+ (async searchParams)
-  const resolvedSearchParams = searchParams instanceof Promise ? await searchParams : searchParams;
-  
-  const rawKhachHang = resolvedSearchParams?.['hoten'];
-  const khachHang = typeof rawKhachHang === 'string' ? rawKhachHang : 'Người lao động';
-
-  // Tải font Roboto hỗ trợ tiếng Việt
-  const fontData = await loadGoogleFont('Roboto', 'Hệ Thống Phân Tích Lộ Trình Hưu Trí Tính Tuổi Nghỉ Hưu & Lộ Trình Đóng Tiếp BHXH Tự Nguyện Chuẩn Xác Nhất Hồ sơ giả định thiết lập riêng cho LONG WEB STUDIO Duy trì phục vụ đồng nghiệp tư vấn an sinh' + khachHang);
+export default async function Image() {
+  const fontData = await getInterFont();
 
   return new ImageResponse(
     (
@@ -50,11 +29,11 @@ export default async function Image({ searchParams }: ImageProps) {
           alignItems: 'flex-start',
           justifyContent: 'space-between',
           padding: '80px',
-          fontFamily: '"Roboto", sans-serif',
+          fontFamily: 'Inter',
         }}
       >
         {/* Khối Header Card */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
           <div
             style={{
               background: 'rgba(59, 130, 246, 0.1)',
@@ -65,7 +44,7 @@ export default async function Image({ searchParams }: ImageProps) {
               textTransform: 'uppercase',
               padding: '8px 20px',
               borderRadius: '50px',
-              marginBottom: '24px',
+              marginBottom: '28px',
               alignSelf: 'flex-start',
               display: 'flex',
             }}
@@ -75,13 +54,13 @@ export default async function Image({ searchParams }: ImageProps) {
           
           <div
             style={{
-              fontSize: '54px',
-              fontWeight: '900',
+              fontSize: '50px',
+              fontWeight: 'bold',
               color: '#ffffff',
-              lineHeight: '1.2',
-              maxWidth: '960px',
+              lineHeight: '1.3',
+              maxWidth: '1040px',
               letterSpacing: '-0.02em',
-              display: 'flex',
+              marginBottom: '20px',
             }}
           >
             Tính Tuổi Nghỉ Hưu & Lộ Trình Đóng Tiếp BHXH Tự Nguyện Chuẩn Xác Nhất
@@ -89,15 +68,13 @@ export default async function Image({ searchParams }: ImageProps) {
           
           <div
             style={{
-              fontSize: '28px',
+              fontSize: '26px',
               color: '#94a3b8',
-              marginTop: '20px',
               display: 'flex',
               alignItems: 'center',
             }}
           >
-            Hồ sơ giả định thiết lập riêng cho:&nbsp;
-            <span style={{ color: '#38bdf8', fontWeight: 'bold' }}>{khachHang}</span>
+            Hỗ trợ cán bộ thu & tư vấn an sinh xã hội hoạch định tài chính
           </div>
         </div>
 
@@ -122,7 +99,6 @@ export default async function Image({ searchParams }: ImageProps) {
               fontSize: '22px',
               fontWeight: 'bold',
               display: 'flex',
-              alignItems: 'center',
             }}
           >
             www.longwebstudio.io.vn/tinh-bhxh-tu-nguyen
@@ -134,7 +110,7 @@ export default async function Image({ searchParams }: ImageProps) {
       ...size,
       fonts: [
         {
-          name: 'Roboto',
+          name: 'Inter',
           data: fontData,
           style: 'normal',
           weight: 700,
