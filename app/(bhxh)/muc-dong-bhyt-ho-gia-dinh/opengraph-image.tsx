@@ -98,11 +98,11 @@ export default async function Image() {
             </p>
           </div>
 
-          {/* Khối tính năng nổi bật */}
+          {/* Khối tính năng nổi bật (Đã sửa justify -> justifyContent) */}
           <div
             style={{
               display: 'flex',
-              justify: 'space-between',
+              justifyContent: 'space-between',
               backgroundColor: 'rgba(15, 23, 42, 0.6)',
               borderRadius: '16px',
               padding: '20px 28px',
@@ -124,7 +124,7 @@ export default async function Image() {
           <div
             style={{
               display: 'flex',
-              justify: 'space-between',
+              justifyContent: 'space-between',
               alignItems: 'center',
               borderTop: '1px solid rgba(147, 197, 253, 0.2)',
               paddingTop: '20px',
