@@ -1,11 +1,41 @@
 'use client'; // Chạy ở môi trường Client để sử dụng các React Hooks và hoạt họa Motion
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react'; // Sử dụng thư viện Motion mới nhất
+
+// Danh sách các liên kết điều hướng tĩnh dùng chung
+const NAV_LINKS = [
+  { href: '/', label: 'Trang chủ' },
+  { href: '/portfolio', label: 'Dự án' },
+  { href: '/pricing', label: 'Bảng giá' },
+];
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  // 1. Khóa cuộn trang nền khi mở Drawer Mobile
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // 2. Lắng nghe phím ESC để đóng Drawer (Đã bỏ kiểu dữ liệu TypeScript)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   return (
     <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
@@ -14,22 +44,31 @@ export default function Header() {
         {/* Logo thương hiệu */}
         <div className="flex-shrink-0">
           <Link href="/" className="font-extrabold text-lg text-slate-950 tracking-tight flex items-center gap-1">
-            <span className="text-red-600 font-black">LONG</span><span className="text-slate-400 font-light text-xs">WEB STUDIO</span>
+            <span className="text-red-600 font-black">LONG</span>
+            <span className="text-slate-400 font-light text-xs">WEB STUDIO</span>
           </Link>
         </div>
 
-        {/* 1. Giao diện Desktop: Menu điều hướng & Nút liên hệ mới của bạn */}
+        {/* 1. Giao diện Desktop: Menu điều hướng & Nút liên hệ */}
         <div className="hidden md:flex items-center gap-6">
           <nav className="flex items-center gap-6">
-            <Link href="/" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
-              Trang chủ
-            </Link>
-            <Link href="/portfolio" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
-              Dự án
-            </Link>
-            <Link href="/pricing" className="text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
-              Bảng giá
-            </Link>
+            {NAV_LINKS.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`text-sm font-semibold transition-colors ${
+                    isActive 
+                      ? 'text-blue-600 font-bold' 
+                      : 'text-gray-600 hover:text-blue-600'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+
             <a 
               href="https://blog.longwebstudio.io.vn" 
               target="_blank" 
@@ -60,6 +99,7 @@ export default function Header() {
           
           <button 
             onClick={() => setIsOpen(true)}
+            aria-expanded={isOpen}
             className="text-slate-500 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-50 focus:outline-none"
             aria-label="Mở menu"
           >
@@ -106,27 +146,24 @@ export default function Header() {
 
                 {/* Danh sách các liên kết di động đồng bộ */}
                 <nav className="flex flex-col space-y-4">
-                  <Link 
-                    href="/" 
-                    onClick={() => setIsOpen(false)}
-                    className="text-base font-bold text-slate-700 hover:text-blue-600 transition-colors border-b border-slate-50 pb-2 block"
-                  >
-                    Trang chủ
-                  </Link>
-                  <Link 
-                    href="/portfolio" 
-                    onClick={() => setIsOpen(false)}
-                    className="text-base font-bold text-slate-700 hover:text-blue-600 transition-colors border-b border-slate-50 pb-2 block"
-                  >
-                    Dự án
-                  </Link>
-                  <Link 
-                    href="/pricing" 
-                    onClick={() => setIsOpen(false)}
-                    className="text-base font-bold text-slate-700 hover:text-blue-600 transition-colors border-b border-slate-50 pb-2 block"
-                  >
-                    Bảng giá
-                  </Link>
+                  {NAV_LINKS.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <Link 
+                        key={link.href}
+                        href={link.href} 
+                        onClick={() => setIsOpen(false)}
+                        className={`text-base border-b border-slate-50 pb-2 block transition-colors ${
+                          isActive 
+                            ? 'font-black text-blue-600' 
+                            : 'font-bold text-slate-700 hover:text-blue-600'
+                        }`}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+
                   <a 
                     href="https://blog.longwebstudio.io.vn" 
                     target="_blank" 
@@ -142,7 +179,7 @@ export default function Header() {
                 </nav>
               </div>
 
-              {/* Hộp hành động nhanh dưới chân ngăn kéo (Đồng bộ nút Liên hệ tư vấn dạng đầy đủ trên Mobile) */}
+              {/* Hộp hành động nhanh dưới chân ngăn kéo */}
               <div className="border-t border-slate-100 pt-6 space-y-3">
                 <Link 
                   href="/contact" 
@@ -151,7 +188,12 @@ export default function Header() {
                 >
                   Liên hệ tư vấn
                 </Link>
-                <a href="https://zalo.me/0966570913" target="_blank" rel="nofollow" className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs text-center block shadow-sm flex items-center justify-center gap-1 transition-colors">
+                <a 
+                  href="https://zalo.me/0966570913" 
+                  target="_blank" 
+                  rel="nofollow" 
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs text-center shadow-sm flex items-center justify-center gap-1 transition-colors"
+                >
                   Trò chuyện Zalo: 0966.570.913
                 </a>
               </div>
