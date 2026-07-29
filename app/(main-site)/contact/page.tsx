@@ -1,148 +1,129 @@
-"use client";
+import { Metadata } from 'next';
+import ContactForm from '@/components/ContactForm';
 
-import { useState } from "react";
-import { motion } from "motion/react";
-import { submitContactMutation } from "@/lib/api";
+// 1. EXPORT METADATA CHUẨN SEO
+export const metadata: Metadata = {
+  title: 'Liên Hệ Tư Vấn & Báo Giá Thiết Kế Website | Long Web Studio',
+  description: 'Liên hệ với Long Web Studio để nhận tư vấn miễn phí giải pháp thiết kế website chuẩn SEO, văn phòng số cho đại lý thu BHXH, BHYT. Hotline/Zalo: 0966.570.913.',
+  alternates: {
+    canonical: 'https://www.longwebstudio.io.vn/contact',
+  },
+  openGraph: {
+    title: 'Liên Hệ Tư Vấn & Báo Giá Thiết Kế Website | Long Web Studio',
+    description: 'Để lại thông tin, Long Web Studio sẽ liên hệ tư vấn giải pháp tối ưu chuyển đổi và phác thảo ý tưởng hoàn toàn miễn phí trong 15 phút.',
+    url: 'https://www.longwebstudio.io.vn/contact',
+    siteName: 'Long Web Studio',
+    locale: 'vi_VN',
+    type: 'website',
+  },
+};
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
-  const [status, setStatus] = useState<{ type: "success" | "error" | null; msg: string }>({ type: null, msg: "" });
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setStatus({ type: null, msg: "" });
-
-    const cleanedPhone = formData.phone.replace(/[\s.-]/g, "");
-    const phoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/;
-    
-    if (!phoneRegex.test(cleanedPhone)) {
-      setStatus({ 
-        type: "error", 
-        msg: "Số điện thoại không đúng định dạng! Vui lòng nhập số điện thoại Việt Nam hợp lệ." 
-      });
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const result = await submitContactMutation(formData);
-      if (result && result.success) {
-        setStatus({ type: "success", msg: result.message });
-        setFormData({ name: "", email: "", phone: "", message: "" });
-      } else {
-        setStatus({ type: "error", msg: result?.message || "Đã xảy ra lỗi hệ thống!" });
-      }
-    } catch (error) {
-      setStatus({ type: "error", msg: "Không thể kết nối đến máy chủ GraphQL API!" });
-    } finally {
-      setLoading(false);
-    }
+  // 2. SCHEMA JSON-LD CONTACTPAGE & ORGANIZATION (TĂNG ĐIỂM UY TÍN E-E-A-T TRÊN GOOGLE)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    'name': 'Liên Hệ Long Web Studio',
+    'description': 'Trang liên hệ tư vấn và báo giá thiết kế website chuyên nghiệp.',
+    'url': 'https://www.longwebstudio.io.vn/contact',
+    'mainEntity': {
+      '@type': 'Organization',
+      'name': 'Long Web Studio',
+      'url': 'https://www.longwebstudio.io.vn',
+      'telephone': '+84966570913',
+      'email': 'contact@longwebstudio.io.vn',
+      'address': {
+        '@type': 'PostalAddress',
+        'addressLocality': 'Hà Nội',
+        'addressCountry': 'VN',
+      },
+      'contactPoint': {
+        '@type': 'ContactPoint',
+        'telephone': '+84966570913',
+        'contactType': 'customer service',
+        'availableLanguage': ['Vietnamese'],
+      },
+    },
   };
 
   return (
-    <section className="max-w-3xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
-      >
+    <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      {/* Mã Schema JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <div className="text-center mb-16">
         <h1 className="text-4xl font-extrabold text-gray-950 sm:text-5xl tracking-tight">
           Khởi Động <span className="text-blue-600">Dự Án</span> Của Bạn
         </h1>
         <p className="mt-4 text-base text-gray-500 max-w-xl mx-auto leading-relaxed">
           Để lại thông tin, Long Web Studio sẽ liên hệ tư vấn giải pháp tối ưu chuyển đổi và phác thảo ý tưởng hoàn toàn miễn phí trong 15 phút.
         </p>
-      </motion.div>
+      </div>
 
-      <motion.form 
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        onSubmit={handleSubmit}
-        className="bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-sm space-y-6"
-      >
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      {/* Bố cục 2 cột: Cột trái chứa thông tin liên hệ EEAT (Google rất thích), Cột phải chứa Form */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        
+        {/* Cột 1: Thông tin liên hệ trực tiếp */}
+        <div className="lg:col-span-5 bg-gray-950 text-white p-8 sm:p-10 rounded-3xl shadow-xl space-y-8 border border-gray-900">
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold text-gray-700">Họ và tên *</label>
-            <input
-              id="name"
-              type="text"
-              required
-              disabled={loading}
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
-              placeholder="Ví dụ: Nguyễn Văn A"
-            />
+            <h2 className="text-2xl font-bold tracking-tight text-white">Thông tin liên hệ</h2>
+            <p className="mt-2 text-sm text-gray-400">
+              Bạn cần trao đổi nhanh? Hãy gọi hoặc nhắn tin trực tiếp qua Zalo để được hỗ trợ tức thì.
+            </p>
           </div>
-          <div>
-            <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">Số điện thoại *</label>
-            <input
-              id="phone"
-              type="tel"
-              required
-              disabled={loading}
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
-              placeholder="Ví dụ: 0901234567"
-            />
+
+          <div className="space-y-6 text-sm">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
+                📞
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-bold uppercase">Hotline / Zalo</p>
+                <a href="https://zalo.me/0966570913" target="_blank" rel="nofollow noopener noreferrer" className="text-base font-bold text-white hover:text-blue-400 transition-colors">
+                  0966.570.913
+                </a>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
+                📧
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-bold uppercase">Email làm việc</p>
+                <a href="mailto:contact@longwebstudio.io.vn" className="text-base font-bold text-white hover:text-blue-400 transition-colors">
+                  contact@longwebstudio.io.vn
+                </a>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-blue-600/20 text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
+                📍
+              </div>
+              <div>
+                <p className="text-xs text-gray-400 font-bold uppercase">Khu vực làm việc</p>
+                <p className="text-sm font-semibold text-gray-300">
+                  TP. Hà Nội, Việt Nam (Hỗ trợ tư vấn &amp; triển khai Remote toàn quốc)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-6 border-t border-gray-800 text-xs text-gray-400 leading-relaxed">
+            ⚡ Cam kết bảo mật thông tin khách hàng. Hỗ trợ kỹ thuật và vận hành 24/7.
           </div>
         </div>
 
-        <div>
-          <label htmlFor="email" className="block text-sm font-semibold text-gray-700">Địa chỉ Email (Không bắt buộc)</label>
-          <input
-            id="email"
-            type="email"
-            disabled={loading}
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
-            placeholder="khachhang@example.com"
-          />
+        {/* Cột 2: Component Form Client */}
+        <div className="lg:col-span-7">
+          <ContactForm />
         </div>
 
-        <div>
-          <label htmlFor="message" className="block text-sm font-semibold text-gray-700">Chi tiết yêu cầu thiết kế / Ý tưởng dự án</label>
-          <textarea
-            id="message"
-            rows={4}
-            disabled={loading}
-            value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
-            placeholder="Ví dụ: Mình cần thiết kế một website bán hàng thời trang..."
-          />
-        </div>
-
-        {status.type && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className={`p-4 rounded-xl text-sm font-semibold border ${
-              status.type === "success" 
-                ? "bg-green-50 text-green-700 border-green-200" 
-                : "bg-red-50 text-red-700 border-red-200"
-            }`}
-          >
-            {status.msg}
-          </motion.div>
-        )}
-
-        <motion.button
-          whileTap={{ scale: 0.98 }}
-          type="submit"
-          disabled={loading}
-          className={`w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${
-            loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
-          }`}
-        >
-          {loading ? "Đang gửi thông tin yêu cầu..." : "Gửi yêu cầu tư vấn ngay"}
-        </motion.button>
-      </motion.form>
-    </section>
+      </div>
+    </div>
   );
 }

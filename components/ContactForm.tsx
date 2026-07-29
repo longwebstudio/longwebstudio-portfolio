@@ -1,0 +1,133 @@
+"use client";
+
+import { useState } from "react";
+import { motion } from "motion/react";
+import { submitContactMutation } from "@/lib/api";
+
+export default function ContactForm() {
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", message: "" });
+  const [status, setStatus] = useState<{ type: "success" | "error" | null; msg: string }>({ type: null, msg: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus({ type: null, msg: "" });
+
+    const cleanedPhone = formData.phone.replace(/[\s.-]/g, "");
+    const phoneRegex = /^(0|\+84)(3|5|7|8|9)[0-9]{8}$/;
+    
+    if (!phoneRegex.test(cleanedPhone)) {
+      setStatus({ 
+        type: "error", 
+        msg: "Số điện thoại không đúng định dạng! Vui lòng nhập số điện thoại Việt Nam hợp lệ." 
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const result = await submitContactMutation(formData);
+      if (result && result.success) {
+        setStatus({ type: "success", msg: result.message });
+        setFormData({ name: "", email: "", phone: "", message: "" });
+      } else {
+        setStatus({ type: "error", msg: result?.message || "Đã xảy ra lỗi hệ thống!" });
+      }
+    } catch (error) {
+      setStatus({ type: "error", msg: "Không thể kết nối đến máy chủ GraphQL API!" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <motion.form 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1 }}
+      onSubmit={handleSubmit}
+      className="bg-white p-6 sm:p-10 rounded-3xl border border-gray-100 shadow-sm space-y-6"
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div>
+          <label htmlFor="name" className="block text-sm font-semibold text-gray-700">Họ và tên *</label>
+          <input
+            id="name"
+            type="text"
+            required
+            disabled={loading}
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
+            placeholder="Ví dụ: Nguyễn Văn A"
+          />
+        </div>
+        <div>
+          <label htmlFor="phone" className="block text-sm font-semibold text-gray-700">Số điện thoại *</label>
+          <input
+            id="phone"
+            type="tel"
+            required
+            disabled={loading}
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
+            placeholder="Ví dụ: 0901234567"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="email" className="block text-sm font-semibold text-gray-700">Địa chỉ Email (Không bắt buộc)</label>
+        <input
+          id="email"
+          type="email"
+          disabled={loading}
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
+          placeholder="khachhang@example.com"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="message" className="block text-sm font-semibold text-gray-700">Chi tiết yêu cầu thiết kế / Ý tưởng dự án</label>
+        <textarea
+          id="message"
+          rows={4}
+          disabled={loading}
+          value={formData.message}
+          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+          className="mt-2 block w-full rounded-xl border border-gray-200 bg-gray-50/30 p-3.5 text-sm font-medium focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all disabled:opacity-50"
+          placeholder="Ví dụ: Mình cần thiết kế một trang web dịch vụ bảo hiểm / landing page bán hàng..."
+        />
+      </div>
+
+      {status.type && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className={`p-4 rounded-xl text-sm font-semibold border ${
+            status.type === "success" 
+              ? "bg-green-50 text-green-700 border-green-200" 
+              : "bg-red-50 text-red-700 border-red-200"
+          }`}
+        >
+          {status.msg}
+        </motion.div>
+      )}
+
+      <motion.button
+        whileTap={{ scale: 0.98 }}
+        type="submit"
+        disabled={loading}
+        className={`w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all ${
+          loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
+        }`}
+      >
+        {loading ? "Đang gửi thông tin yêu cầu..." : "Gửi yêu cầu tư vấn ngay"}
+      </motion.button>
+    </motion.form>
+  );
+}
