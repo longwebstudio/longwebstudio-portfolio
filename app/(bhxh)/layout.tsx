@@ -1,9 +1,9 @@
-import type { Metadata, Viewport } from 'next';
+import type { Metadata } from 'next';
 import { Be_Vietnam_Pro } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 
-// Tối ưu font chữ tiếng Việt sắc nét
+// Tối ưu font chữ tiếng Việt
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['vietnamese', 'latin'],
   weight: ['300', '400', '500', '600', '700', '800', '900'],
@@ -11,8 +11,8 @@ const beVietnamPro = Be_Vietnam_Pro({
   display: 'swap',
 });
 
-// Cấu hình Viewport di động
-export const viewport: Viewport = {
+// Sửa lỗi: Bỏ type ": Viewport", Next.js sẽ tự nhận diện
+export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
@@ -64,22 +64,18 @@ export default function RootLayout({
   return (
     <html lang="vi" className={`scroll-smooth ${beVietnamPro.variable}`}>
       <head>
-        {/* Preconnect tới server ảnh mã VietQR để quét mã tải nhanh tức thì */}
+        {/* Preconnect tới server ảnh mã VietQR */}
         <link rel="preconnect" href="https://img.vietqr.io" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://img.vietqr.io" />
       </head>
       <body className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased selection:bg-blue-600 selection:text-white">
         {children}
 
-        {/* =========================================================================
-            BỔ SUNG: NHÚNG MÃ GOOGLE ANALYTICS (GTAG.JS) TỐI ƯU HIỆU NĂNG TẢI TRANG (ISR)
-           ========================================================================= */}
-        {/* Thẻ 1: Tải thư viện script từ máy chủ Google dưới dạng chạy ngầm (afterInteractive) */}
+        {/* Google Analytics (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-KX2H4QTFST"
           strategy="afterInteractive"
         />
-        {/* Thẻ 2: Khởi tạo cấu hình đo lường dữ liệu truy cập cho tên miền */}
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
